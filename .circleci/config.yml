@@ -1,0 +1,16 @@
+---
+version: 2
+jobs:
+  build:
+    working_directory: ~/ansible-logdna
+    docker:
+      - image: popstas/ubuntu-molecule
+    branches:
+      only:
+        - master
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Run tests via Molecule
+          command: molecule test
