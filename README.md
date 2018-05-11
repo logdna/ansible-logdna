@@ -34,7 +34,7 @@ These variables map directly to the native configuration options for the LogDNA 
 * `conf_hostname`: Alternative host name to be used
 * `conf_tags`: Tags to be added.
 
-## How to Install:
+## How to Install
 * Online from Ansible Galaxy: `ansible-galaxy install logdna.logdna`
 * Directly from Source Code: `ansible-galaxy install git+https://github.com/logdna/ansible-logdna.git`
 
@@ -90,3 +90,7 @@ These variables map directly to the native configuration options for the LogDNA 
 
 * Author: [Samir Musali](https://github.com/ldsamir), LogDNA
 * License: MIT
+
+## Contributing
+
+Contributions are always welcome. See the [contributing guide](https://github.com/logdna/ansible-logdna/blob/master/CONTRIBUTING.md) to learn how you can help.
