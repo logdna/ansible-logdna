@@ -86,11 +86,11 @@ These variables map directly to the native configuration options for the LogDNA 
      - { role: logdna.logdna }
 ```
 
+## Contributing
+
+Contributions are always welcome. See the [contributing guide](https://github.com/logdna/ansible-logdna/blob/master/CONTRIBUTING.md) to learn how you can help.
+
 ## License and Authors
 
 * Author: [Samir Musali](https://github.com/ldsamir), LogDNA
 * License: MIT
-
-## Contributing
-
-Contributions are always welcome. See the [contributing guide](https://github.com/logdna/ansible-logdna/blob/master/CONTRIBUTING.md) to learn how you can help.
