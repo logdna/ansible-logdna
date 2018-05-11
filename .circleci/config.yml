@@ -14,3 +14,6 @@ jobs:
       - run:
           name: Run tests via Molecule
           command: molecule test
+notify:
+  webhooks:
+    - url: https://galaxy.ansible.com/api/v1/notifications/

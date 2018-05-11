@@ -23,8 +23,7 @@ galaxy_info:
         - xenial
         - artful
 
-  categories:
-    - logging
+  cloud_platforms: []
 
   galaxy_tags:
     - logging
