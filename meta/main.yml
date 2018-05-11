@@ -1,4 +1,5 @@
 ---
+
 galaxy_info:
   author: Samir Musali
   description: Ansible Galaxy Role to install and configure LogDNA Agent
