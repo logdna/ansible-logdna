@@ -6,7 +6,7 @@ galaxy_info:
   issue_tracker_url: https://github.com/logdna/ansible-logdna/issues
   license: MIT
   min_ansible_version: 2.1
-  github_branch: https://github.com/logdna/ansible-logdna
+  github_branch: master
 
   platforms:
     - name: Debian
