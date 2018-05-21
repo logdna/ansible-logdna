@@ -86,6 +86,25 @@ These variables map directly to the native configuration options for the LogDNA 
      - { role: logdna.logdna }
 ```
 
+## LogDNA Callback Plugin
+
+LogDNA Callback Plugin is a handler to send the logs from each `ansible-playbook` run to LogDNA. Right now it supports the following categories of the logs: `STATS`, `FAILED`, `OK`, `UNREACHABLE`, `ASYNC_FAILED`, `ASYNC_OK`. It can be configured in the following way:
+* If LogDNA Agent Python Package is not installed, please install it using one of the following commands depending on the version of Python you are using: `pip install logdna` or `pip3 install logdna` 
+* If the version of Ansible you are using is older than `v2.6` (i.e. `<= v2.5`), do the following step:
+  * Download the plugin from [here](https://raw.githubusercontent.com/logdna/ansible-logdna/master/lib/ansible/plugins/callback/logdna.py) into the folder of callback plugins. You can find the folder with the following command: `echo $(ansible-doc -F | awk 'FNR == 1 {print $2}' | sed 's/\/modules/+/g' | cut -d'+' -f 1)/plugins/callback`
+* If there is no `ansible.cfg` on your system, do the following steps:
+  * Make sure `/etc/ansible` folder exists by doing `mkdir -p /etc/ansible`
+  * Download `ansible.cfg` from [here](https://raw.githubusercontent.com/ansible/ansible/devel/examples/ansible.cfg) into `/etc/ansible/`
+* Do `ANSIBLE_CONFIG=< Path to ansible.cfg >`
+* Open `ansible.cfg` and do the following steps:
+  * Uncomment the line containing `callback_whitelist`, if commented, and append `logdna`
+  * Uncomment the line containing `callback_plugins`, if commented, and update the path to Callback Plugins
+* In order to make the plugin working, the following environmental variables should be set:
+  * `LOGDNA_INGESTION_KEY`: LogDNA Ingestion Key in order to stream the logs - **required**
+  * `ANSIBLE_IGNORE_ERRORS`: Whether to ignore errors on failing or not; `False` by default - **optional**
+  * `LOGDNA_HOSTNAME`: Alternative Host Name to be used in the logs - **optional**
+  * `LOGDNA_TAGS`: Comma-separated list of tags; `ansible` by default - **optional**
+
 ## Contributing
 
 Contributions are always welcome. See the [contributing guide](https://github.com/logdna/ansible-logdna/blob/master/CONTRIBUTING.md) to learn how you can help.
