@@ -2,6 +2,6 @@
 - name: Converge
   hosts: all
   vars:
-    conf_key: "0123456789abcdef0123456789"
+    conf_key: '0123456789abcdef0123456789'
   roles:
     - role: ansible-logdna
