@@ -2,14 +2,14 @@
 # Parameters:
 
 ## Configuration:
-conf_key: null
-conf_config: null
-conf_logdir: null
-conf_logfile: null
-conf_exclude: null
-conf_exclude_regex: null
-conf_hostname: null
-conf_tags: null
+conf_key: ""
+conf_config: ""
+conf_logdir: ""
+conf_logfile: ""
+conf_exclude: ""
+conf_exclude_regex: ""
+conf_hostname: ""
+conf_tags: ""
 
 ## Agent State:
 agent_install: true
