@@ -1,6 +1,6 @@
 tests/*.retry
 *.retry
-
+.DS_Store
 *.log
 .vagrant
 
