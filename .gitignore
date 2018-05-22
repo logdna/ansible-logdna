@@ -1,6 +1,7 @@
 tests/*.retry
 *.retry
 .DS_Store
+*/.DS_Store
 *.log
 .vagrant
 
