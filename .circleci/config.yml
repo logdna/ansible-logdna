@@ -5,9 +5,6 @@ jobs:
     working_directory: ~/ansible-logdna
     docker:
       - image: popstas/ubuntu-molecule
-    branches:
-      only:
-        - master
     steps:
       - checkout
       - setup_remote_docker
