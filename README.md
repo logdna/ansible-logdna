@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/logdna/ansible-logdna.svg?style=svg)](https://circleci.com/gh/logdna/ansible-logdna)
+
 # Deploy LogDNA Agent with Ansible
 
 ## Description
