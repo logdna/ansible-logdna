@@ -282,12 +282,20 @@ class LogDNAHTTPIngestEndpoint():
         meta['system_user'] = self.user
         meta['uuid'] = result._task._uuid
 
+        # objects accessible to log message format conversion
         action = meta['ansible_task'].get('action')
+        ansible_version = meta['ansible_version']
         changed = meta['ansible_changed']
+        check_mode = meta['ansible_check_mode']
+        execution_time = meta['ansible_execution_time']
         host = meta['ansible_host']
+        ip = meta['system_ip']
         name = result._task_fields.get('name', None)
         if not name:
             name = ""
+        session = meta['ansible_session']
+        user = meta['system_user']
+        uuid = meta['uuid']
         playbook = meta['ansible_playbook']
         role = meta['ansible_role']
         status = meta['ansible_status']
