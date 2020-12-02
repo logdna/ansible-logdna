@@ -90,10 +90,8 @@ These variables map directly to the native configuration options for the LogDNA 
 
 ## LogDNA Callback Plugin
 
-LogDNA Callback Plugin is a handler to send the logs from each `ansible-playbook` run to LogDNA. Right now it supports the following categories of the logs: `STATS`, `FAILED`, `OK`, `UNREACHABLE`, `ASYNC_FAILED`, `ASYNC_OK`. It can be configured in the following way:
-* If LogDNA Agent Python Package is not installed, please install it using one of the following commands depending on the version of Python you are using: `pip install logdna` or `pip3 install logdna` 
-* If the version of Ansible you are using is older than `v2.6` (i.e. `<= v2.5`), do the following step:
-  * Download the plugin from [here](https://raw.githubusercontent.com/logdna/ansible-logdna/master/lib/ansible/plugins/callback/logdna.py) into the folder of callback plugins. You can find the folder with the following command: `echo $(ansible-doc -F | awk 'FNR == 1 {print $2}' | sed 's/\/modules/+/g' | cut -d'+' -f 1)/plugins/callback`
+LogDNA Callback Plugin is a handler that can send the logs from each `ansible-playbook` run to LogDNA. Currently the ansible v2 event categories are supported: `FAILED`, `OK`, `UNREACHABLE`, `SKIPPED`. It can be installed with the following steps:
+* Download the plugin from [here](https://raw.githubusercontent.com/logdna/ansible-logdna/master/lib/ansible/plugins/callback/logdna.py) into the folder of callback plugins. You can find the folder with the following command: `echo $(ansible-doc -F | awk 'FNR == 1 {print $2}' | sed 's/\/modules/+/g' | cut -d'+' -f 1)/plugins/callback`
 * If there is no `ansible.cfg` on your system, do the following steps:
   * Make sure `/etc/ansible` folder exists by doing `mkdir -p /etc/ansible`
   * Download `ansible.cfg` from [here](https://raw.githubusercontent.com/ansible/ansible/devel/examples/ansible.cfg) into `/etc/ansible/`
@@ -103,9 +101,24 @@ LogDNA Callback Plugin is a handler to send the logs from each `ansible-playbook
   * Uncomment the line containing `callback_plugins`, if commented, and update the path to Callback Plugins
 * In order to make the plugin working, the following environmental variables should be set:
   * `LOGDNA_INGESTION_KEY`: LogDNA Ingestion Key in order to stream the logs - **required**
-  * `ANSIBLE_IGNORE_ERRORS`: Whether to ignore errors on failing or not; `False` by default - **optional**
+  * `LOGDNA_APPNAME`: Override the default app name for log messages `Ansible` by default - **optional**
+  * `LOGDNA_DISABLE_LOGLEVELS`: Do not send events with log levels; `False` by default - **optional**
+  * `LOGDNA_IGNORE_FAILED`: Whether to ignore failed tasks or not; `False` by default - **optional**
+  * `LOGDNA_IGNORE_OK`: Whether to ignore OK tasks or not; `False` by default - **optional**
+  * `LOGDNA_IGNORE_SKIPPED`: Whether to ignore skipped tasks or not; `False` by default - **optional**
+  * `LOGDNA_IGNORE_UNREACHABLE`: Whether to ignore unreachable tasks or not; `False` by default - **optional**
+  * `LOGDNA_HOST`: Use alternative logging endpoint host, `logs.logdna.com` by default - **optional**
+  * `LOGDNA_ENDPOINT`: Use alternative logging endpoint resouce, `/logs/ingest` by default - **optional**
   * `LOGDNA_HOSTNAME`: Alternative Host Name to be used in the logs - **optional**
   * `LOGDNA_TAGS`: Comma-separated list of tags; `ansible` by default - **optional**
+  * `LOGDNA_LOG_FORMAT`: Override the default line message format - **optional**
+
+Environment variables can also be placed in your `ansible.cfg` with the variables being all lowercase. For example:
+```
+[callback_logdna]
+logdna_ingestion_key = ffffffffffffffffffffffffffffffffff
+logdna_log_format = action={action} changed={changed} host={host} playbook={playbook} role={role} status={status} {name}
+```
 
 ## Contributing
 
@@ -113,5 +126,7 @@ Contributions are always welcome. See the [contributing guide](https://github.co
 
 ## License and Authors
 
-* Author: [Samir Musali](https://github.com/ldsamir), LogDNA
+* Authors:
+  * [Samir Musali](https://github.com/ldsamir), LogDNA
+  * [Jonathan Kelley](https://github.com/jondkelley), LogDNA
 * License: MIT
