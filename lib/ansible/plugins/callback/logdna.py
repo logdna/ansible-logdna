@@ -31,7 +31,8 @@ from uuid import getnode
 
 __metaclass__ = type
 
-__logdna_callback_version__ = "1.0.0"
+__CALLBACK_NAME__ = 'logdna'
+__CALLBACK_VERSION__ = 2.0
 
 DOCUMENTATION = '''
     callback: logdna
@@ -214,10 +215,12 @@ class SafeFormat(Formatter):
     """
 
     def get_field(self, field_name, args, kwargs):
-        if "." in field_name or "[" in field_name:
-            raise Exception("Invalid string formatting used "
-                            "with option `logdna_log_format` "
-                            "Fields cannot contain [ or .")
+        if ('.' in field_name
+            or '[' in field_name
+                or '(' in field_name):
+            raise Exception('Invalid string formatting used '
+                            'with option `logdna_log_format` '
+                            'Fields cannot contain [ or .')
         return super().get_field(field_name, args, kwargs)
 
 
@@ -229,8 +232,8 @@ class LogDNAHTTPIngestEndpoint():
 
     def __init__(self):
         self.ansible_check_mode = False
-        self.ansible_playbook = ""
-        self.ansible_version = ""
+        self.ansible_playbook = ''
+        self.ansible_version = ''
         self.session = str(uuid4())
         self.host = get_local_hostname()
         self.ip_address = get_ipaddr()
@@ -292,7 +295,7 @@ class LogDNAHTTPIngestEndpoint():
         ip = meta['system_ip']
         name = result._task_fields.get('name', None)
         if not name:
-            name = ""
+            name = ''
         session = meta['ansible_session']
         user = meta['system_user']
         uuid = meta['uuid']
@@ -303,13 +306,13 @@ class LogDNAHTTPIngestEndpoint():
         if conf_log_fmt:
             form = conf_log_fmt
         else:
-            form = ("status={status} "
-                    "action={action} "
-                    "changed={changed} "
-                    "play={playbook} "
-                    "role={role} "
-                    "host={host} "
-                    "name={name}"
+            form = ('status={status} '
+                    'action={action} '
+                    'changed={changed} '
+                    'play={playbook} '
+                    'role={role} '
+                    'host={host} '
+                    'name={name}'
                     )
 
         safe = SafeFormat()
@@ -323,21 +326,21 @@ class LogDNAHTTPIngestEndpoint():
                                   name=name).strip()
 
         logline = {
-            "lines": [
+            'lines': [
                 {
-                    "line": log_message,
-                    "timestamp": timestamp,
-                    "app": conf_appname,
-                    "meta": meta,
+                    'line': log_message,
+                    'timestamp': timestamp,
+                    'app': conf_appname,
+                    'meta': meta,
                 }
             ]
         }
 
         loglevels = {
-            "OK": "INFO",
-            "SKIPPED": "WARN",
-            "FAILED": "ERROR",
-            "UNREACHABLE": "WARN",
+            'OK': 'INFO',
+            'SKIPPED': 'WARN',
+            'FAILED': 'ERROR',
+            'UNREACHABLE': 'WARN',
         }
         if not conf_disable_loglevel:
             loglevel = loglevels.get(state, 'UNKNOWN')
@@ -352,27 +355,27 @@ class LogDNAHTTPIngestEndpoint():
         request_json = json_dumps(logline, sort_keys=True)
 
         request_params = {
-            "hostname": conf_hostname,
-            "now": datetime_now,
+            'hostname': conf_hostname,
+            'now': datetime_now,
         }
 
         if conf_tags:
             urlparams['tags'] = conf_tags
 
-        request_uri = "https://{host}{endpoint}?{params}".format(
+        request_uri = 'https://{host}{endpoint}?{params}'.format(
             host=conf_host,
             endpoint=conf_endpoint,
             params=urlencode(request_params))
 
-        user_agent = "ansible-callback/{version}".format(
-            version=__logdna_callback_version__)
+        user_agent = 'ansible-callback/{version}'.format(
+            version=CALLBACK_VERSION)
 
         open_url(
             request_uri,
             request_json,
             force_basic_auth=True,
             headers={
-                "content-type": "application/json; charset=UTF-8"
+                'content-type': 'application/json; charset=UTF-8'
             },
             http_agent=user_agent,
             method='POST',
@@ -383,9 +386,9 @@ class LogDNAHTTPIngestEndpoint():
 
 
 class CallbackModule(CallbackBase):
-    CALLBACK_VERSION = 2.0
+    CALLBACK_VERSION = __CALLBACK_VERSION__
     CALLBACK_TYPE = 'aggregate'
-    CALLBACK_NAME = 'logdna'
+    CALLBACK_NAME = __CALLBACK_NAME__
     CALLBACK_NEEDS_WHITELIST = True
 
     def __init__(self, display=None):
@@ -393,9 +396,9 @@ class CallbackModule(CallbackBase):
         self.start_datetimes = {}  # Collect task start times
         self.logdna_callback = LogDNAHTTPIngestEndpoint()
         self.defaults = {
-            "logdna_appname": "Ansible",
-            "logdna_endpoint": "/logs/ingest",
-            "logdna_host": "logs.logdna.com",
+            'logdna_appname': 'Ansible',
+            'logdna_endpoint': '/logs/ingest',
+            'logdna_host': 'logs.logdna.com',
         }
 
     def _execution_timer(self, result):
@@ -471,14 +474,14 @@ class CallbackModule(CallbackBase):
         if self.conf_ingestion_key is None:
             self.disabled = True
             self._display.warning(
-                "To use ansible callback logdna you must provide you"
-                "r ingest key with the `LOGDNA_INGESTION_KEY` enviro"
-                "nment variable or in your ansible.cfg file.")
+                'To use ansible callback logdna you must provide you'
+                'r ingest key with the `LOGDNA_INGESTION_KEY` enviro'
+                'nment variable or in your ansible.cfg file.')
 
         self.conf_ip_addr = self.get_option('logdna_ip_address')
         if self.conf_ip_addr is None:
             self.conf_ip_addr = get_ipaddr()
-        elif str(self.conf_ip_addr).lower().startswith("disable"):
+        elif str(self.conf_ip_addr).lower().startswith('disable'):
             self.conf_ip_addr = None
 
         self.conf_log_fmt = self.get_option('logdna_log_format')
