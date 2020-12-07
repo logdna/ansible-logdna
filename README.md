@@ -92,6 +92,8 @@ These variables map directly to the native configuration options for the LogDNA 
 
 The LogDNA Plugin is a callback handler that can send the logs for each playbook task back to your LogDNA instance. We capture the action, state, changed(true/false), host, playbook, role, status, and task name for the log line. Additionally we capture the internal variables from ansible as additional metadata for the playbook for search indexing.
 
+<img src="ansible_callback_logviewer.png" width="700">
+
 The plugin can be installed with the following steps:
 
 * Set your callback plugins folder for your ansible installation into a variable by running
