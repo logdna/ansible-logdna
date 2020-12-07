@@ -107,6 +107,7 @@ The plugin can be installed with the following steps:
 #### Required Configuration for Callback
 * If there is no `ansible.cfg` on your system, do the following steps:
   * Create a file in your home directory called `ansible.cfg` with the following values:
+  * *NOTE: You can use any other valid ansible.cfg location as defined in the [ansible documenation](https://docs.ansible.com/ansible/latest/reference_appendices/config.html#the-configuration-file)*
 
 ```
 [defaults]
