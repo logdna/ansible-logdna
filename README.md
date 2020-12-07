@@ -94,12 +94,17 @@ The LogDNA Plugin is a callback handler that can send the logs for each playbook
 
 <img src="ansible_callback_logviewer.png" width="700">
 
+#### Plugin Install Directions for Callback
+
 The plugin can be installed with the following steps:
 
 * Set your callback plugins folder for your ansible installation into a variable by running
   * `export PLUGIN_INSTALL_PATH=$(ansible-doc -F | awk 'FNR == 1 {print $2}' | sed 's/\/modules/+/g' | cut -d'+' -f 1)/plugins/callback`
 * Download the LogDNA callback plugin from [here](https://raw.githubusercontent.com/logdna/ansible-logdna/master/lib/ansible/plugins/callback/logdna.py) into your callback plugins directory.
   * `wget -P $PLUGIN_INSTALL_PATH https//raw.githubusercontent.com/logdna/ansible-logdna/master/lib/ansible/plugins/callback/logdna.py`
+
+
+#### Required Configuration for Callback
 * If there is no `ansible.cfg` on your system, do the following steps:
   * Create a file in your home directory called `ansible.cfg` with the following values:
 
@@ -111,7 +116,7 @@ logdna_ingestion_key = VALID_INGESTION_KEY_GOES_HERE
 logdna_tags = tag1,tag2
 ```
 
-### Additional Callback Configurations
+#### Optional Callback Options
 
 This plugin supports these optional configuration options via `ansible.cfg` under heading `[callback_logdna]`
 
