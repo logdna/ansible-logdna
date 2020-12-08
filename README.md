@@ -102,7 +102,8 @@ The plugin can be installed with the following steps:
   * `export PLUGIN_INSTALL_PATH=$(ansible-doc -F | awk 'FNR == 1 {print $2}' | sed 's/\/modules/+/g' | cut -d'+' -f 1)/plugins/callback`
   * This can also be installed in the `callback_plugins` directory in the root of your playbook if you wish to avoid a global installation.
 * Download the LogDNA callback plugin from [here](https://raw.githubusercontent.com/logdna/ansible-logdna/master/lib/ansible/plugins/callback/logdna.py) into your callback plugins directory.
-  * `wget -P $PLUGIN_INSTALL_PATH https//raw.githubusercontent.com/logdna/ansible-logdna/master/lib/ansible/plugins/callback/logdna.py`
+  * Using wget `wget -P $PLUGIN_INSTALL_PATH https://raw.githubusercontent.com/logdna/ansible-logdna/master/lib/ansible/plugins/callback/logdna.py`
+  * Alternatively with curl `cd $PLUGIN_INSTALL_PATH && { curl -O curl -O https://raw.githubusercontent.com/logdna/ansible-logdna/master/lib/ansible/plugins/callback/logdna.py ; cd -; }`
 
 
 #### Required Configuration for Callback
