@@ -17,14 +17,7 @@
 
 from __future__ import (absolute_import, division, print_function)
 __LEGACY_PYTHON__ = False
-try:
-    from ansible.module_utils.urls import open_url
-except ImportError:
-    # python 2.7 support
-    import urllib2
-    from json import dumps
-    from base64 import encodestring
-    __LEGACY_PYTHON__ = True
+from ansible.module_utils.urls import open_url
 from ansible.plugins.callback import CallbackBase
 from datetime import datetime
 from os.path import basename
@@ -181,18 +174,6 @@ examples: >
 '''
 
 
-def open_url_legacy(uri, data, headers, username, password=''):
-    log = dumps(data)
-    request = urllib2.Request(
-        url=url,
-        headers=headers,
-        data=log)
-    base64string = encodestring('%s:%s' % (
-        username, password)).replace('\n', '')
-    request.add_header("Authorization", "Basic %s" % base64string)
-    return urllib2.urlopen(request).read()
-
-
 def get_local_hostname():
     """
     get hostname of ansible runner host
@@ -307,6 +288,8 @@ class LogDNAHTTPIngestEndpoint():
         meta['uuid'] = result._task._uuid
 
         # objects accessible to log message format conversion
+        # most other internal objects will be restricted because
+        # of the SafeFormat() class
         action = meta['ansible_task'].get('action')
         ansible_version = meta['ansible_version']
         changed = meta['ansible_changed']
@@ -325,19 +308,19 @@ class LogDNAHTTPIngestEndpoint():
         status = meta['ansible_status']
 
         if conf_log_fmt:
-            form = conf_log_fmt
+            fmt = conf_log_fmt
         else:
-            form = ('status={status} '
-                    'action={action} '
-                    'changed={changed} '
-                    'play={playbook} '
-                    'role={role} '
-                    'host={host} '
-                    'name={name}'
-                    )
+            fmt = ('status={status} '
+                   'action={action} '
+                   'changed={changed} '
+                   'play={playbook} '
+                   'role={role} '
+                   'host={host} '
+                   'name={name}'
+                   )
 
         safe = SafeFormat()
-        log_message = safe.format(form,
+        log_message = safe.format(fmt,
                                   action=action,
                                   changed=changed,
                                   host=host,
@@ -394,21 +377,17 @@ class LogDNAHTTPIngestEndpoint():
         headers = {
             'content-type': 'application/json; charset=UTF-8'
         }
-        if not __LEGACY_PYTHON__:
-            open_url(
-                request_uri,
-                request_json,
-                force_basic_auth=True,
-                headers=headers,
-                http_agent=user_agent,
-                method='POST',
-                timeout=5,
-                url_username=conf_ingestion_key,
-                validate_certs=True,
-            )
-        else:
-            open_url_legacy(request_uri, request_json,
-                            headers, conf_ingestion_key)
+        open_url(
+            request_uri,
+            request_json,
+            force_basic_auth=True,
+            headers=headers,
+            http_agent=user_agent,
+            method='POST',
+            timeout=5,
+            url_username=conf_ingestion_key,
+            validate_certs=True,
+        )
 
 
 class CallbackModule(CallbackBase):
