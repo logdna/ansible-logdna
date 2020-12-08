@@ -240,7 +240,8 @@ class SafeFormat(Formatter):
                 or '(' in field_name):
             raise Exception('Invalid string formatting used '
                             'with option `logdna_log_format` '
-                            'Fields cannot contain [ or .')
+                            'Fields cannot contain characters'
+                            ' such as: . [ (')
         return super().get_field(field_name, args, kwargs)
 
 
