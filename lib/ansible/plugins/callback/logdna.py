@@ -16,7 +16,15 @@
 # along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import (absolute_import, division, print_function)
-from ansible.module_utils.urls import open_url
+__LEGACY_PYTHON__ = False
+try:
+    from ansible.module_utils.urls import open_url
+except ImportError:
+    # python 2.7 support
+    import urllib2
+    from json import dumps
+    from base64 import encodestring
+    __LEGACY_PYTHON__ = True
 from ansible.plugins.callback import CallbackBase
 from datetime import datetime
 from os.path import basename
@@ -171,6 +179,18 @@ examples: >
     logdna_appname = example_ansible_project
     logdna_log_format = action={action} changed={changed} host={host} playbook={playbook} role={role} status={status} {name}
 '''
+
+
+def open_url_legacy(uri, data, headers, username, password=''):
+    log = dumps(data)
+    request = urllib2.Request(
+        url=url,
+        headers=headers,
+        data=log)
+    base64string = encodestring('%s:%s' % (
+        username, password)).replace('\n', '')
+    request.add_header("Authorization", "Basic %s" % base64string)
+    return urllib2.urlopen(request).read()
 
 
 def get_local_hostname():
@@ -368,21 +388,26 @@ class LogDNAHTTPIngestEndpoint():
             params=urlencode(request_params))
 
         user_agent = 'ansible-callback/{version}'.format(
-            version=CALLBACK_VERSION)
+            version=__CALLBACK_VERSION__)
 
-        open_url(
-            request_uri,
-            request_json,
-            force_basic_auth=True,
-            headers={
-                'content-type': 'application/json; charset=UTF-8'
-            },
-            http_agent=user_agent,
-            method='POST',
-            timeout=5,
-            url_username=conf_ingestion_key,
-            validate_certs=True,
-        )
+        headers = {
+            'content-type': 'application/json; charset=UTF-8'
+        }
+        if not __LEGACY_PYTHON__:
+            open_url(
+                request_uri,
+                request_json,
+                force_basic_auth=True,
+                headers=headers,
+                http_agent=user_agent,
+                method='POST',
+                timeout=5,
+                url_username=conf_ingestion_key,
+                validate_certs=True,
+            )
+        else:
+            open_url_legacy(request_uri, request_json,
+                            headers, conf_ingestion_key)
 
 
 class CallbackModule(CallbackBase):
