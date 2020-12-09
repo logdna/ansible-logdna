@@ -173,6 +173,18 @@ examples: >
 '''
 
 
+def delete_empty_values(d):
+    """
+    removes empty values from a dictionary
+    to prevent uneccessary metadata key transmission
+    """
+    if not isinstance(d, (dict, list)):
+        return d
+    if isinstance(d, list):
+        return [v for v in (delete_empty_values(v) for v in d) if v]
+    return {k: v for k, v in ((k, delete_empty_values(v)) for k, v in d.items()) if v}
+
+
 def get_local_hostname():
     """
     get hostname of ansible runner host
@@ -285,26 +297,25 @@ class LogDNAHTTPIngestEndpoint():
         meta['system_ip'] = self.ip_address
         meta['system_user'] = self.user
         meta['uuid'] = result._task._uuid
+        meta = delete_empty_values(meta)
 
         # objects accessible to log message format conversion
-        # most other internal objects will be restricted because
-        # of the SafeFormat() class
-        action = meta['ansible_task'].get('action')
-        ansible_version = meta['ansible_version']
-        changed = meta['ansible_changed']
-        check_mode = meta['ansible_check_mode']
-        execution_time = meta['ansible_execution_time']
-        host = meta['ansible_host']
-        ip = meta['system_ip']
+        action = meta.get('ansible_task', {}).get('action')
+        ansible_version = meta.get('ansible_version')
+        changed = meta.get('ansible_changed')
+        check_mode = meta.get('ansible_check_mode')
+        execution_time = meta.get('ansible_execution_time')
+        host = meta.get('ansible_host')
+        ip = meta.get('system_ip')
         name = result._task_fields.get('name', None)
         if not name:
-            name = ''
-        session = meta['ansible_session']
-        user = meta['system_user']
-        uuid = meta['uuid']
-        playbook = meta['ansible_playbook']
-        role = meta['ansible_role']
-        status = meta['ansible_status']
+            name = ""
+        session = meta.get('ansible_session')
+        user = meta.get('system_user')
+        uuid = meta.get('uuid')
+        playbook = meta.get('ansible_playbook')
+        role = meta.get('ansible_role')
+        status = meta.get('ansible_status')
 
         if conf_log_fmt:
             fmt = conf_log_fmt
