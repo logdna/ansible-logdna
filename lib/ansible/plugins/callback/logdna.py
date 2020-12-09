@@ -509,14 +509,18 @@ class CallbackModule(CallbackBase):
 
         self.conf_tags = self.get_option('logdna_tags')
 
+    def v2_playbook_on_handler_task_start(self, task):
+        self.start_datetimes[task._uuid] = datetime.utcnow()
+
     def v2_playbook_on_start(self, playbook):
         self.logdna_callback.ansible_playbook = basename(playbook._file_name)
 
     def v2_playbook_on_task_start(self, task, is_conditional):
         self.start_datetimes[task._uuid] = datetime.utcnow()
 
-    def v2_playbook_on_handler_task_start(self, task):
-        self.start_datetimes[task._uuid] = datetime.utcnow()
+    def v2_runner_on_failed(self, result, **kwargs):
+        if not self.conf_ignore_failed:
+            self._handle_event('FAILED', result)
 
     def v2_runner_on_ok(self, result, **kwargs):
         if not self.conf_ignore_ok:
@@ -525,14 +529,6 @@ class CallbackModule(CallbackBase):
     def v2_runner_on_skipped(self, result, **kwargs):
         if not self.conf_ignore_skipped:
             self._handle_event('SKIPPED', result)
-
-    def v2_runner_on_failed(self, result, **kwargs):
-        if not self.conf_ignore_failed:
-            self._handle_event('FAILED', result)
-
-    def runner_on_async_failed(self, result, **kwargs):
-        if not self.conf_ignore_failed:
-            self._handle_event('FAILED', result)
 
     def v2_runner_on_unreachable(self, result, **kwargs):
         if not self.conf_ignore_unreachable:
