@@ -115,8 +115,7 @@ The plugin can be installed with the following steps:
 [defaults]
 callback_whitelist = logdna
 [callback_logdna]
-logdna_ingestion_key = VALID_INGESTION_KEY_GOES_HERE
-logdna_tags = tag1,tag2
+logdna_ingestion_key = YOUR_LOGDNA_INGEST_KEY
 ```
 
 #### Optional Callback Options
