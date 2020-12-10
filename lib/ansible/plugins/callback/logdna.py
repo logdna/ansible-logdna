@@ -444,7 +444,8 @@ class CallbackModule(CallbackBase):
         if not ((action in self.conf_ignore_actions)
                 or (role in self.conf_ignore_roles)
                 or (play in self.conf_ignore_plays)
-                or (status.lower() in self.conf_ignore_statuses)):
+                or (status.lower() in self.conf_ignore_statuses)
+                or (self.disabled)):
             self.logdna_callback.send_logdna(
                 self.conf_appname,
                 self.conf_endpoint,
