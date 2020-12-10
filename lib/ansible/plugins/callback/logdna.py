@@ -145,6 +145,13 @@ DOCUMENTATION = '''
         ini:
           - section: callback_logdna
             key: logdna_tags
+      logdna_timeout:
+        description: If defined, override the default LogDNA endpoint timeout, default is 5 seconds
+        env:
+          - name: LOGDNA_TIMEOUT
+        ini:
+          - section: callback_logdna
+            key: logdna_timeout
       logdna_use_target_host_for_hostname:
         description: If defined as true, override the default hostname behavior to use the ansible target host as the host for logs sent to LogDNA.
         env:
@@ -255,7 +262,8 @@ class LogDNAHTTPIngestEndpoint():
     def send_logdna(self, conf_appname, conf_endpoint,
                     conf_disable_loglevel, conf_host, conf_hostname,
                     conf_ingestion_key, conf_ip_addr, conf_log_fmt,
-                    conf_mac_addr, conf_tags, state, result, exectime):
+                    conf_mac_addr, conf_tags, conf_timeout,
+                    state, result, exectime):
         datetime_now = time()
         iso_now = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
 
@@ -394,7 +402,7 @@ class LogDNAHTTPIngestEndpoint():
             headers=headers,
             http_agent=user_agent,
             method='POST',
-            timeout=5,
+            timeout=conf_timeout,
             url_username=conf_ingestion_key,
             validate_certs=True,
         )
@@ -414,6 +422,7 @@ class CallbackModule(CallbackBase):
             'logdna_appname': 'ansible',
             'logdna_endpoint': '/logs/ingest',
             'logdna_host': 'logs.logdna.com',
+            'logdna_timeout': 5,
         }
 
     def _execution_timer(self, result):
@@ -447,6 +456,7 @@ class CallbackModule(CallbackBase):
                 self.conf_log_fmt,
                 self.conf_mac_addr,
                 self.conf_tags,
+                self.conf_timeout,
                 status,
                 result,
                 self._execution_timer(result)
@@ -474,6 +484,9 @@ class CallbackModule(CallbackBase):
         if self.conf_host is None:
             self.conf_host = self.defaults.get('logdna_host')
 
+        self.conf_timeout = self.get_option('logdna_timeout')
+        if not self.conf_timeout:
+            self.conf_timeout = self.defaults.get('logdna_timeout')
         # if use_local_hostname is set to any value, use get_local_hostname()
         # of the ansible runner host, else default to logdna_hostname and
         # if that is unset, the targeted ansible host will be used.

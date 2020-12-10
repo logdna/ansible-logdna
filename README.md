@@ -137,6 +137,7 @@ This plugin supports these optional configuration options via `ansible.cfg` unde
   * Default value is `action={action} changed={changed} host={host} playbook={playbook} role={role} status={status} name={name}`
 * `logdna_mac_address` Override the MAC address in your log message with an alternate value, default is autodetected.
 * `logdna_tags` Optional, single tag or comma-seperated list of tags to optionally include with log events.
+* `logdna_timeout` Optional, override the default LogDNA endpoint timeout, default is 5 seconds.
 * `logdna_use_target_host_for_hostname` If defined as true, override the default hostname behavior to use the ansible target host as the host for logs sent to LogDNA.
 
 All of these options can be set with environment variables in your shell
@@ -155,6 +156,7 @@ All of these options can be set with environment variables in your shell
 * LOGDNA_LOG_FORMAT
 * LOGDNA_MAC_ADDRESS
 * LOGDNA_TAGS
+* LOGDNA_TIMEOUT
 * LOGDNA_USE_TARGET_HOST_FOR_HOSTNAME
 
 ## Contributing
