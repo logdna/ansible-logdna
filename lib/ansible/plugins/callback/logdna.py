@@ -48,42 +48,42 @@ DOCUMENTATION = '''
       - You must provide your LogDNA Ingestion Key (found in your settings under API Keys)
     options:
       logdna_appname:
-        description: Set the LogDNA application name, default Ansible
+        description: Set the LogDNA application name in the log viewer, default - ansible
         env:
           - name: LOGDNA_APPNAME
         ini:
           - section: callback_logdna
             key: logdna_appname
       logdna_endpoint:
-        description: Optional, API endpoint resource to use, default /logs/ingest
+        description: Set LogDNA API endpoint resource to use, default /logs/ingest
         env:
           - name: LOGDNA_ENDPOINT
         ini:
           - section: callback_logdna
             key: logdna_endpoint
       logdna_disable_loglevels:
-        description: Optional, does not send the log levels for use in the LogDNA web UI display
+        description: If defined as true will not transmit log levels in messages sent to LogDNA
         env:
           - name: LOGDNA_DISABLE_LOGLEVELS
         ini:
           - section: callback_logdna
             key: logdna_disable_loglevels
       logdna_host:
-        description: Optional, API hostname to forward logs to, default logs.logdna.com
+        description: Set LogDNA API endpoint host, default logs.logdna.com
         env:
           - name: LOGDNA_HOST
         ini:
           - section: callback_logdna
             key: logdna_host
       logdna_hostname:
-        description: Optional, override the default log source hostname to this value
+        description: If defined will set the default log source hostname value
         env:
           - name: LOGDNA_HOSTNAME
         ini:
           - section: callback_logdna
             key: logdna_hostname
       logdna_ignore_status_names:
-        description: Name or comma-seperated list playbook status names to ignore log transmission to LogDNA for example - ok,failed,unreachable
+        description: Status or comma-seperated list playbook status names to ignore log transmission to LogDNA for example - ok,failed,unreachable
         env:
           - name: LOGDNA_IGNORE_STATUS_NAMES
         ini:
@@ -118,21 +118,21 @@ DOCUMENTATION = '''
           - section: callback_logdna
             key: logdna_ingestion_key
       logdna_ip_address:
-        description: Optional, override the detected system IP in your log source with an alternate value
+        description: Override the system IP in your log message with an alternate value, default is autodetected
         env:
           - name: LOGDNA_IP_ADDRESS
         ini:
           - section: callback_logdna
             key: logdna_ip_address
       logdna_log_format:
-        description: Optional, override the default log line formatting to your own custom format
+        description: Override the default log line formatting to your own custom format
         env:
           - name: LOGDNA_LOG_FORMAT
         ini:
           - section: callback_logdna
             key: logdna_log_format
       logdna_mac_address:
-        description: Optional, override the detected system MAC address in your log source with an alternate value
+        description: Override the system MAC address in your log message with an alternate value, default is autodetected
         env:
           - name: LOGDNA_MAC_ADDRESS
         ini:
@@ -146,7 +146,7 @@ DOCUMENTATION = '''
           - section: callback_logdna
             key: logdna_tags
       logdna_use_target_host_for_hostname:
-        description: Optional, use the ansible targeted host for the hostname in log messages rather then the ansible controller hostname
+        description: If defined as true, override the default hostname behavior to use the ansible target host as the host for logs sent to LogDNA.
         env:
           - name: LOGDNA_USE_TARGET_HOST_FOR_HOSTNAME
         ini:

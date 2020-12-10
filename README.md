@@ -123,21 +123,21 @@ logdna_tags = tag1,tag2
 
 This plugin supports these optional configuration options via `ansible.cfg` under heading `[callback_logdna]`
 
-* `logdna_appname` to customize the default appname in the log viewer, default `Ansible`
-* `logdna_host` to override the default host to send logs to, default `logs.logdna.com`, this is OK in most configurations.
-* `logdna_endpoint` to override the default endpoint to send logs to, default `/logs/ingest`, this is OK in most configurations.
-* `logdna_disable_loglevels` set to true to disable info/warn/error log levels being sent with Ansible logs, default is disabled.
-* `logdna_hostname` to customize the hostname you send for the log viewer.
-* `logdna_ignore_status_names` name or comma-seperated list playbook status names to ignore log transmission to LogDNA for example: ok,failed,unreachable
-* `logdna_ignore_action_names` action or comma-seperated list playbook actions to ignore log transmission to LogDNA for example: gather_facts,shell,debug
-* `logdna_ignore_role_names` role or comma-seperated list role names to ignore log transmission to LogDNA for example: nginx,redis
-* `logdna_ignore_play_names` playbook or comma-seperated list playbook names to ignore log transmission to LogDNA for example: nginx.yml,redis.yml
-* `logdna_ip_address` customize the IP address transmitted with logs being sent to LogDNA.
-* `logdna_log_format` customize the log format of the logline sent to LogDNA.
+* `logdna_appname` will customize the default app name in the log viewer, default is `ansible`
+* `logdna_host` LogDNA API endpoint host, default is `logs.logdna.com`
+* `logdna_endpoint` LogDNA API endpoint resource to use, default is `/logs/ingest`
+* `logdna_disable_loglevels` If defined as true will not transmit log levels in messages sent to LogDNA, default sends log levels.
+* `logdna_hostname` If defined will set the default log source hostname value.
+* `logdna_ignore_status_names` Status or comma-seperated list playbook status names to ignore log transmission to LogDNA for example: ok,failed,unreachable
+* `logdna_ignore_action_names` Action or comma-seperated list playbook actions to ignore log transmission to LogDNA for example: gather_facts,shell,debug
+* `logdna_ignore_role_names` Role or comma-seperated list role names to ignore log transmission to LogDNA for example: nginx,redis
+* `logdna_ignore_play_names` Playbook or comma-seperated list playbook names to ignore log transmission to LogDNA for example: nginx.yml,redis.yml
+* `logdna_ip_address` Override the system IP in your log message with an alternate value, default is autodetected.
+* `logdna_log_format` Customize the log format of the log line sent to LogDNA.
   * Default value is `action={action} changed={changed} host={host} playbook={playbook} role={role} status={status} name={name}`
-* `logdna_mac_address` customize the MAC address of the logline sent to LogDNA.
-* `logdna_tags` customize tags sent to the LogDNA log viewer, you can seperate multiple values with commas.
-* `logdna_use_target_host_for_hostname` override the default behavior to use the target host as the host for logs sent to LogDNA.
+* `logdna_mac_address` Override the MAC address in your log message with an alternate value, default is autodetected.
+* `logdna_tags` Optional, single tag or comma-seperated list of tags to optionally include with log events.
+* `logdna_use_target_host_for_hostname` If defined as true, override the default hostname behavior to use the ansible target host as the host for logs sent to LogDNA.
 
 All of these options can be set with environment variables in your shell
 
