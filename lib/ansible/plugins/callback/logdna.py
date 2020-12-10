@@ -82,34 +82,34 @@ DOCUMENTATION = '''
         ini:
           - section: callback_logdna
             key: logdna_hostname
-      logdna_ignore_failed:
-        description: Optional, do not log tasks that FAIL
+      logdna_ignore_status_names:
+        description: Name or comma-seperated list playbook status names to ignore log transmission to LogDNA for example - ok,failed,unreachable
         env:
-          - name: LOGDNA_IGNORE_FAILED
+          - name: LOGDNA_IGNORE_STATUS_NAMES
         ini:
           - section: callback_logdna
-            key: logdna_ignore_failed
-      logdna_ignore_ok:
-        description: Optional, do not log tasks that are OK
+            key: logdna_ignore_status_names
+      logdna_ignore_action_names:
+        description: Action or comma-seperated list playbook actions to ignore log transmission to LogDNA for example - gather_facts,shell,debug
         env:
-          - name: LOGDNA_IGNORE_OK
+          - name: LOGDNA_IGNORE_ACTION_NAMES
         ini:
           - section: callback_logdna
-            key: logdna_ignore_ok
-      logdna_ignore_skipped:
-        description: Optional, do not log tasks that are SKIPPED
+            key: logdna_ignore_action_names
+      conf_ignore_role_names:
+        description: Role or comma-seperated list role names to ignore log transmission to LogDNA for example - nginx,redis
         env:
-          - name: LOGDNA_IGNORE_SKIPPED
+          - name: LOGDNA_IGNORE_ROLE_NAMES
         ini:
           - section: callback_logdna
-            key: logdna_ignore_skipped
-      logdna_ignore_unreachable:
-        description: Optional, do not log tasks that were UNREACHABLE
+            key: conf_ignore_role_names
+      conf_ignore_play_names:
+        description: Playbook or comma-seperated list playbook names to ignore log transmission to LogDNA for example - nginx.yml,redis.yml
         env:
-          - name: LOGDNA_IGNORE_UNREACHABLE
+          - name: LOGDNA_IGNORE_PLAY_NAMES
         ini:
           - section: callback_logdna
-            key: logdna_ignore_unreachable
+            key: conf_ignore_play_names
       logdna_ingestion_key:
         description: Required, ingestion key used to authenticate against the LogDNA ingestion endpoint
         env:
@@ -374,7 +374,7 @@ class LogDNAHTTPIngestEndpoint():
         }
 
         if conf_tags:
-            urlparams['tags'] = conf_tags
+            request_params['tags'] = conf_tags
 
         request_uri = 'https://{host}{endpoint}?{params}'.format(
             host=conf_host,
@@ -429,21 +429,28 @@ class CallbackModule(CallbackBase):
         """
         call logdna helper method
         """
-        self.logdna_callback.send_logdna(
-            self.conf_appname,
-            self.conf_endpoint,
-            self.conf_disable_loglevel,
-            self.conf_host,
-            self.conf_hostname,
-            self.conf_ingestion_key,
-            self.conf_ip_addr,
-            self.conf_log_fmt,
-            self.conf_mac_addr,
-            self.conf_tags,
-            status,
-            result,
-            self._execution_timer(result)
-        )
+        action = result._task_fields.get('action')
+        role = result._task._role
+        play = self.logdna_callback.ansible_playbook
+        if not ((action in self.conf_ignore_actions)
+                or (role in self.conf_ignore_roles)
+                or (play in self.conf_ignore_plays)
+                or (status.lower() in self.conf_ignore_statuses)):
+            self.logdna_callback.send_logdna(
+                self.conf_appname,
+                self.conf_endpoint,
+                self.conf_disable_loglevel,
+                self.conf_host,
+                self.conf_hostname,
+                self.conf_ingestion_key,
+                self.conf_ip_addr,
+                self.conf_log_fmt,
+                self.conf_mac_addr,
+                self.conf_tags,
+                status,
+                result,
+                self._execution_timer(result)
+            )
 
     def set_options(self, task_keys=None, var_options=None, direct=None):
         """
@@ -476,14 +483,29 @@ class CallbackModule(CallbackBase):
         if not self.conf_use_target_host_for_hostnmae:
             self.conf_hostname = get_local_hostname()
 
-        self.conf_ignore_failed = self.get_option('logdna_ignore_failed')
+        self.conf_ignore_statuses= self.get_option('logdna_ignore_status_names')
+        if self.conf_ignore_statuses:
+            self.conf_ignore_statuses = self.conf_ignore_statuses.lower().split(',')
+        else:
+            self.conf_ignore_statuses = []
 
-        self.conf_ignore_ok = self.get_option('logdna_ignore_ok')
+        self.conf_ignore_actions = self.get_option('logdna_ignore_action_names')
+        if self.conf_ignore_actions:
+            self.conf_ignore_actions = self.conf_ignore_actions.split(',')
+        else:
+            self.conf_ignore_actions = []
 
-        self.conf_ignore_skipped = self.get_option('logdna_ignore_skipped')
+        self.conf_ignore_roles = self.get_option('conf_ignore_role_names')
+        if self.conf_ignore_roles:
+            self.conf_ignore_roles = self.conf_ignore_roles.split(',')
+        else:
+            self.conf_ignore_roles = []
 
-        self.conf_ignore_unreachable = self.get_option(
-            'logdna_ignore_unreachable')
+        self.conf_ignore_plays = self.get_option('conf_ignore_play_names')
+        if self.conf_ignore_plays:
+            self.conf_ignore_plays = self.conf_ignore_plays.split(',')
+        else:
+            self.conf_ignore_plays = []
 
         self.conf_ingestion_key = self.get_option('logdna_ingestion_key')
         if self.conf_ingestion_key is None:
@@ -519,17 +541,13 @@ class CallbackModule(CallbackBase):
         self.start_datetimes[task._uuid] = datetime.utcnow()
 
     def v2_runner_on_failed(self, result, **kwargs):
-        if not self.conf_ignore_failed:
-            self._handle_event('FAILED', result)
+        self._handle_event('FAILED', result)
 
     def v2_runner_on_ok(self, result, **kwargs):
-        if not self.conf_ignore_ok:
-            self._handle_event('OK', result)
+        self._handle_event('OK', result)
 
     def v2_runner_on_skipped(self, result, **kwargs):
-        if not self.conf_ignore_skipped:
-            self._handle_event('SKIPPED', result)
+        self._handle_event('SKIPPED', result)
 
     def v2_runner_on_unreachable(self, result, **kwargs):
-        if not self.conf_ignore_unreachable:
-            self._handle_event('UNREACHABLE', result)
+        self._handle_event('UNREACHABLE', result)

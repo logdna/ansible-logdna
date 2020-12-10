@@ -128,10 +128,10 @@ This plugin supports these optional configuration options via `ansible.cfg` unde
 * `logdna_endpoint` to override the default endpoint to send logs to, default `/logs/ingest`, this is OK in most configurations.
 * `logdna_disable_loglevels` set to true to disable info/warn/error log levels being sent with Ansible logs, default is disabled.
 * `logdna_hostname` to customize the hostname you send for the log viewer.
-* `logdna_ignore_failed` set to true to omit failed tasks being sent to LogDNA. Default is to send these messages.
-* `logdna_ignore_ok` set to true to omit OK tasks being sent to LogDNA. Default is to send these messages.
-* `logdna_ignore_skipped` set to true to omit skipped tasks being sent to LogDNA. Default is to send these messages.
-* `logdna_ignore_unreachable` set to true to omit unreachable tasks being sent to LogDNA. Default is to send these messages.
+* `logdna_ignore_status_names` name or comma-seperated list playbook status names to ignore log transmission to LogDNA for example: ok,failed,unreachable
+* `logdna_ignore_action_names` action or comma-seperated list playbook actions to ignore log transmission to LogDNA for example: gather_facts,shell,debug
+* `logdna_ignore_role_names` role or comma-seperated list role names to ignore log transmission to LogDNA for example: nginx,redis
+* `logdna_ignore_play_names` playbook or comma-seperated list playbook names to ignore log transmission to LogDNA for example: nginx.yml,redis.yml
 * `logdna_ip_address` customize the IP address transmitted with logs being sent to LogDNA.
 * `logdna_log_format` customize the log format of the logline sent to LogDNA.
   * Default value is `action={action} changed={changed} host={host} playbook={playbook} role={role} status={status} name={name}`
@@ -146,10 +146,10 @@ All of these options can be set with environment variables in your shell
 * LOGDNA_ENDPOINT
 * LOGDNA_DISABLE_LOGLEVELS
 * LOGDNA_HOSTNAME
-* LOGDNA_IGNORE_FAILED
-* LOGDNA_IGNORE_OK
-* LOGDNA_IGNORE_SKIPPED
-* LOGDNA_IGNORE_UNREACHABLE
+* LOGDNA_IGNORE_STATUS_NAMES
+* LOGDNA_IGNORE_ACTION_NAMES
+* LOGDNA_IGNORE_PLAY_NAMES
+* LOGDNA_IGNORE_ROLE_NAMES
 * LOGDNA_INGESTION_KEY
 * LOGDNA_IP_ADDRESS
 * LOGDNA_LOG_FORMAT
