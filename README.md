@@ -90,22 +90,73 @@ These variables map directly to the native configuration options for the LogDNA 
 
 ## LogDNA Callback Plugin
 
-LogDNA Callback Plugin is a handler to send the logs from each `ansible-playbook` run to LogDNA. Right now it supports the following categories of the logs: `STATS`, `FAILED`, `OK`, `UNREACHABLE`, `ASYNC_FAILED`, `ASYNC_OK`. It can be configured in the following way:
-* If LogDNA Agent Python Package is not installed, please install it using one of the following commands depending on the version of Python you are using: `pip install logdna` or `pip3 install logdna` 
-* If the version of Ansible you are using is older than `v2.6` (i.e. `<= v2.5`), do the following step:
-  * Download the plugin from [here](https://raw.githubusercontent.com/logdna/ansible-logdna/master/lib/ansible/plugins/callback/logdna.py) into the folder of callback plugins. You can find the folder with the following command: `echo $(ansible-doc -F | awk 'FNR == 1 {print $2}' | sed 's/\/modules/+/g' | cut -d'+' -f 1)/plugins/callback`
+The LogDNA Plugin is a callback handler that can send the logs for each playbook task back to your LogDNA instance. We capture the action, state, changed(true/false), host, playbook, role, status, and task name for the log line. Additionally we capture the internal variables from ansible as additional metadata for the playbook for search indexing.
+
+<img src="ansible_callback_logviewer.png" width="700">
+
+#### Plugin Install Directions for Callback
+
+The plugin can be installed with the following steps:
+
+* You can download the LogDNA callback plugin from [here](https://raw.githubusercontent.com/logdna/ansible-logdna/master/lib/ansible/plugins/callback/logdna.py)
+  * Using wget `wget -P $PLUGIN_INSTALL_PATH https://raw.githubusercontent.com/logdna/ansible-logdna/master/lib/ansible/plugins/callback/logdna.py`
+  * Alternatively with curl `cd $PLUGIN_INSTALL_PATH && { curl -O curl -O https://raw.githubusercontent.com/logdna/ansible-logdna/master/lib/ansible/plugins/callback/logdna.py ; cd -; }`
+* Set your callback plugins folder for your ansible installation into a variable by running
+  * `export PLUGIN_INSTALL_PATH=$(ansible-doc -F | awk 'FNR == 1 {print $2}' | sed 's/\/modules/+/g' | cut -d'+' -f 1)/plugins/callback`
+  * Copy the logdna.py file to your path `cp logdna.py $PLUGIN_INSTALL_PATH`
+  * This can also be installed in the `callback_plugins` directory adjacent to your play, inside a role, or by putting it in one of the callback directory sources in [ansible.cfg](https://docs.ansible.com/ansible/latest/reference_appendices/config.html#ansible-configuration-settings).
+
+#### Required Configuration for Callback
 * If there is no `ansible.cfg` on your system, do the following steps:
-  * Make sure `/etc/ansible` folder exists by doing `mkdir -p /etc/ansible`
-  * Download `ansible.cfg` from [here](https://raw.githubusercontent.com/ansible/ansible/devel/examples/ansible.cfg) into `/etc/ansible/`
-* Do `ANSIBLE_CONFIG=< Path to ansible.cfg >`
-* Open `ansible.cfg` and do the following steps:
-  * Uncomment the line containing `callback_whitelist`, if commented, and append `logdna`
-  * Uncomment the line containing `callback_plugins`, if commented, and update the path to Callback Plugins
-* In order to make the plugin working, the following environmental variables should be set:
-  * `LOGDNA_INGESTION_KEY`: LogDNA Ingestion Key in order to stream the logs - **required**
-  * `ANSIBLE_IGNORE_ERRORS`: Whether to ignore errors on failing or not; `False` by default - **optional**
-  * `LOGDNA_HOSTNAME`: Alternative Host Name to be used in the logs - **optional**
-  * `LOGDNA_TAGS`: Comma-separated list of tags; `ansible` by default - **optional**
+  * Create a file in your home directory called `ansible.cfg` with the following values:
+  * *NOTE: You can use any other valid ansible.cfg location as defined in the [ansible documenation](https://docs.ansible.com/ansible/latest/reference_appendices/config.html#the-configuration-file)*
+
+```
+[defaults]
+callback_whitelist = logdna
+[callback_logdna]
+logdna_ingestion_key = YOUR_LOGDNA_INGEST_KEY
+```
+
+#### Optional Callback Options
+
+This plugin supports these optional configuration options via `ansible.cfg` under heading `[callback_logdna]`
+
+* `logdna_appname` will customize the default app name in the log viewer, default is `ansible`
+* `logdna_host` LogDNA API endpoint host, default is `logs.logdna.com`
+* `logdna_endpoint` LogDNA API endpoint resource to use, default is `/logs/ingest`
+* `logdna_disable_loglevels` If defined as true will not transmit log levels in messages sent to LogDNA, default sends log levels.
+* `logdna_hostname` If defined will set the default log source hostname value.
+* `logdna_ignore_status_names` Status or comma-seperated list playbook status names to ignore log transmission to LogDNA for example: ok,failed,unreachable
+* `logdna_ignore_action_names` Action or comma-seperated list playbook actions to ignore log transmission to LogDNA for example: gather_facts,shell,debug
+* `logdna_ignore_role_names` Role or comma-seperated list role names to ignore log transmission to LogDNA for example: nginx,redis
+* `logdna_ignore_play_names` Playbook or comma-seperated list playbook names to ignore log transmission to LogDNA for example: nginx.yml,redis.yml
+* `logdna_ip_address` Override the system IP in your log message with an alternate value, default is autodetected.
+* `logdna_log_format` Customize the log format of the log line sent to LogDNA.
+  * Default value is `action={action} changed={changed} host={host} playbook={playbook} role={role} status={status} name={name}`
+* `logdna_mac_address` Override the MAC address in your log message with an alternate value, default is autodetected.
+* `logdna_tags` Single tag or comma-seperated list of tags to optionally include with log events.
+* `logdna_timeout` Override the default LogDNA endpoint timeout, default is 5 seconds.
+* `logdna_use_target_host_for_hostname` If defined as true, override the default hostname behavior to use the ansible target host as the host for logs sent to LogDNA.
+
+All of these options can be set with environment variables in your shell
+
+* LOGDNA_APPNAME
+* LOGDNA_HOST
+* LOGDNA_ENDPOINT
+* LOGDNA_DISABLE_LOGLEVELS
+* LOGDNA_HOSTNAME
+* LOGDNA_IGNORE_STATUS_NAMES
+* LOGDNA_IGNORE_ACTION_NAMES
+* LOGDNA_IGNORE_PLAY_NAMES
+* LOGDNA_IGNORE_ROLE_NAMES
+* LOGDNA_INGESTION_KEY
+* LOGDNA_IP_ADDRESS
+* LOGDNA_LOG_FORMAT
+* LOGDNA_MAC_ADDRESS
+* LOGDNA_TAGS
+* LOGDNA_TIMEOUT
+* LOGDNA_USE_TARGET_HOST_FOR_HOSTNAME
 
 ## Contributing
 
@@ -113,5 +164,8 @@ Contributions are always welcome. See the [contributing guide](https://github.co
 
 ## License and Authors
 
-* Author: [Samir Musali](https://github.com/ldsamir), LogDNA
+* Authors:
+  * [Samir Musali](https://github.com/ldsamir), LogDNA
+  * [Jonathan Kelley](https://github.com/jondkelley), LogDNA
 * License: MIT
+
