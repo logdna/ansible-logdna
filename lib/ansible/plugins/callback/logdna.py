@@ -419,7 +419,7 @@ class CallbackModule(CallbackBase):
         self.start_datetimes = {}  # Collect task start times
         self.logdna_callback = LogDNAHTTPIngestEndpoint()
         self.defaults = {
-            'logdna_appname': 'ansible',
+            'logdna_appname': 'Ansible',
             'logdna_endpoint': '/logs/ingest',
             'logdna_host': 'logs.logdna.com',
             'logdna_timeout': 5,
