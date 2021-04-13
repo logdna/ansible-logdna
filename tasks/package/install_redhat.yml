@@ -6,7 +6,18 @@
     name: logdna-agent
     description: LogDNA Agent YUM Package
     baseurl: http://repo.logdna.com/el6/
-    gpgcheck: false
+    gpgkey: https://repo.logdna.com/logdna.gpg
+    gpgcheck: true
 
 - name: Install LogDNA Agent
-  yum: state=present name=logdna-agent
+  dnf:
+    name: logdna-agent
+    state: present
+
+- name: Install LogDNA Service
+  copy:
+    src: logdna-agent.service
+    dest: /lib/systemd/system/logdna-agent.service
+    mode: 644
+  notify:
+    - Reload Systemctl
