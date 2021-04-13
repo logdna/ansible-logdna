@@ -1,0 +1,14 @@
+[Unit]
+# /etc/systemd/system/logdna-agent.service
+Description=LogDNA (remote logging) service
+Requires=network.target
+After=syslog.target network.target
+
+[Service]
+Type=simple
+PIDFile=/var/run/logdna.pid
+ExecStart=/usr/bin/logdna-agent start
+ExecStop=/usr/bin/logdna-agent stop
+
+[Install]
+WantedBy=multi-user.target
